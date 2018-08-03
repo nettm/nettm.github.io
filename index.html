@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>程序员小站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="程序员小站">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="程序员小站">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="程序员小站">
+  
+    <link rel="alternate" href="/atom.xml" title="程序员小站" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">程序员小站</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="article-2018-07-31-rocketmq-store-index" class="article article-type-article" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/07/31/2018-07-31-rocketmq-store-index/" class="article-date">
+  <time datetime="2018-07-30T16:03:00.000Z" itemprop="datePublished">2018-07-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/源码分析/">源码分析</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/07/31/2018-07-31-rocketmq-store-index/">RocketMQ的存储索引的实现方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="RocketMQ存储索引解读"><a href="#RocketMQ存储索引解读" class="headerlink" title="RocketMQ存储索引解读"></a>RocketMQ存储索引解读</h2><h4 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a>索引结构</h4><p>索引包括3个部分，分别是Header、Slot、Index。这3个部分是顺序存储的。其中Header的长度为40个字节。</p>
+<p>Header</p>
+<table>
+<thead>
+<tr>
+<th>beginTimestamp</th>
+<th>endTimestamp</th>
+<th>beginPhyOffset</th>
+<th>endPhyOffset</th>
+<th>hashSlotCount</th>
+<th>indexCount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>long</td>
+<td>long</td>
+<td>long</td>
+<td>long</td>
+<td>int</td>
+<td>int</td>
+</tr>
+<tr>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>4</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Slot</p>
+<table>
+<thead>
+<tr>
+<th>indexCount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int</td>
+</tr>
+<tr>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Index</p>
+<table>
+<thead>
+<tr>
+<th>keyHash</th>
+<th>phyOffset</th>
+<th>timeDiff</th>
+<th>slotValue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int</td>
+<td>long</td>
+<td>int</td>
+<td>int</td>
+</tr>
+<tr>
+<td>4</td>
+<td>8</td>
+<td>4</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>索引文件存储的长度为<br><code>IndexHeader.INDEX_HEADER_SIZE + (hashSlotNum * hashSlotSize) + (indexNum * indexSize)</code><br>默认值为<br><code>40 + 5000000 * 4 + 5000000 * 4 * 20</code><br>其中文件头的长度为40字节，slot的长度为4字节， index的长度为20字节</p>
+<p>Slot和Index的位置算法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> keyHash = indexKeyHashMethod(key);</span><br><span class="line"><span class="keyword">int</span> slotPos = keyHash % <span class="keyword">this</span>.hashSlotNum;</span><br><span class="line"><span class="keyword">int</span> absSlotPos = IndexHeader.INDEX_HEADER_SIZE + slotPos * hashSlotSize;</span><br><span class="line"><span class="keyword">int</span> absIndexPos = IndexHeader.INDEX_HEADER_SIZE + <span class="keyword">this</span>.hashSlotNum * hashSlotSize</span><br><span class="line">        + <span class="keyword">this</span>.indexHeader.getIndexCount() * indexSize;</span><br></pre></td></tr></table></figure></p>
+<p>Slot和Index的内容<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absIndexPos, keyHash);</span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putLong(absIndexPos + <span class="number">4</span>, phyOffset);</span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absIndexPos + <span class="number">4</span> + <span class="number">8</span>, (<span class="keyword">int</span>) timeDiff);</span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absIndexPos + <span class="number">4</span> + <span class="number">8</span> + <span class="number">4</span>, slotValue);</span><br><span class="line"></span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absSlotPos, <span class="keyword">this</span>.indexHeader.getIndexCount());</span><br></pre></td></tr></table></figure></p>
+<h4 id="搜索算法"><a href="#搜索算法" class="headerlink" title="搜索算法"></a>搜索算法</h4><p>计算KEY在索引文件中的位置方法如下：</p>
+<ol>
+<li>计算KEY的哈希值</li>
+<li>用计算的结果除以slot的数量，取余</li>
+<li>头文件长度 + 余数 * slot的长度即为slot的位置</li>
+<li>slot中存储的值为index的数量</li>
+<li>头文件长度 + slot数量 <em> slot的长度 + index数量 </em> index的长度即为index的位置</li>
+<li>按index的内容取出数据</li>
+</ol>
+<h4 id="索引文件名称"><a href="#索引文件名称" class="headerlink" title="索引文件名称"></a>索引文件名称</h4><p>索引文件的名称是由时间戳构成的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">String.format(<span class="string">"%04d%02d%02d%02d%02d%02d%03d"</span>, </span><br><span class="line">    cal.get(Calendar.YEAR), </span><br><span class="line">    cal.get(Calendar.MONTH) + <span class="number">1</span>,</span><br><span class="line">    cal.get(Calendar.DAY_OF_MONTH), </span><br><span class="line">    cal.get(Calendar.HOUR_OF_DAY), </span><br><span class="line">    cal.get(Calendar.MINUTE), </span><br><span class="line">    cal.get(Calendar.SECOND),</span><br><span class="line">    cal.get(Calendar.MILLISECOND));</span><br></pre></td></tr></table></figure></p>
+<h4 id="优化手段"><a href="#优化手段" class="headerlink" title="优化手段"></a>优化手段</h4><ol>
+<li>服务在启动时会把所有的索引文件加载到内存中</li>
+<li>定期清理过期索引文件</li>
+<li>异步同步索引到磁盘</li>
+</ol>
+<h4 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h4><ol>
+<li>slot的作用是什么呢，为什么不直接使用index</li>
+<li>对于KEY的哈希计算有一定的几率计算结果相同，即哈希值相同</li>
+<li>由于代码中把文件锁的代码注释掉了，这样不会有并发问题吗</li>
+</ol>
+<h4 id="用到的类"><a href="#用到的类" class="headerlink" title="用到的类"></a>用到的类</h4><ol>
+<li>ByteBuffer</li>
+<li>MappedByteBuffer</li>
+<li>FileChannel</li>
+<li>FileLock</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/07/31/2018-07-31-rocketmq-store-index/" data-id="cjkdygu960000jbxjrao0tyu7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RacketMQ/">RacketMQ</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/源码分析/">源码分析</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RacketMQ/">RacketMQ</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/RacketMQ/" style="font-size: 10px;">RacketMQ</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/07/31/2018-07-31-rocketmq-store-index/">RocketMQ的存储索引的实现方法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 nettm<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
