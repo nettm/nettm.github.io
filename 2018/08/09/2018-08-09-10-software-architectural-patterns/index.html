@@ -3,15 +3,20 @@
 <head>
   <meta charset="utf-8">
   
-  <title>程序员小站</title>
+  <title>十种常用的架构模式 | 程序员小站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="程序员小站">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="十种常用的架构模式 分层架构最常用的架构模式，一般采用这种架构模式时，系统一般分成4层，分别是   交互层 服务层 领域层 持久层此种架构模式一般应用于桌面系统或web应用系统   客户/服务端模式此种模式一般是由一个服务端和多个客户端构成，服务端监听客户端的请求并响应。此种架构模式一般应用于邮箱系统和银行系统 主从架构模式此架构模式包含主从两部分，主机负责给从机分配工作，从机进行计算并返回">
+<meta name="keywords" content="Java,Architecture">
+<meta property="og:type" content="article">
+<meta property="og:title" content="十种常用的架构模式">
+<meta property="og:url" content="http://yoursite.com/2018/08/09/2018-08-09-10-software-architectural-patterns/index.html">
 <meta property="og:site_name" content="程序员小站">
+<meta property="og:description" content="十种常用的架构模式 分层架构最常用的架构模式，一般采用这种架构模式时，系统一般分成4层，分别是   交互层 服务层 领域层 持久层此种架构模式一般应用于桌面系统或web应用系统   客户/服务端模式此种模式一般是由一个服务端和多个客户端构成，服务端监听客户端的请求并响应。此种架构模式一般应用于邮箱系统和银行系统 主从架构模式此架构模式包含主从两部分，主机负责给从机分配工作，从机进行计算并返回">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-08-09T07:33:34.517Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="程序员小站">
+<meta name="twitter:title" content="十种常用的架构模式">
+<meta name="twitter:description" content="十种常用的架构模式 分层架构最常用的架构模式，一般采用这种架构模式时，系统一般分成4层，分别是   交互层 服务层 领域层 持久层此种架构模式一般应用于桌面系统或web应用系统   客户/服务端模式此种模式一般是由一个服务端和多个客户端构成，服务端监听客户端的请求并响应。此种架构模式一般应用于邮箱系统和银行系统 主从架构模式此架构模式包含主从两部分，主机负责给从机分配工作，从机进行计算并返回">
   
     <link rel="alternate" href="/atom.xml" title="程序员小站" type="application/atom+xml">
   
@@ -60,9 +65,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="article-2018-08-09-10-software-architectural-patterns" class="article article-type-article" itemscope itemprop="blogPost">
+        <section id="main"><article id="article-2018-08-09-10-software-architectural-patterns" class="article article-type-article" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/09/2018-08-09-10-software-architectural-patterns/" class="article-date">
   <time datetime="2018-08-08T23:33:00.000Z" itemprop="datePublished">2018-08-09</time>
@@ -79,8 +82,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/09/2018-08-09-10-software-architectural-patterns/">十种常用的架构模式</a>
+    <h1 class="article-title" itemprop="name">
+      十种常用的架构模式
     </h1>
   
 
@@ -135,154 +138,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="article-2018-07-31-rocketmq-store-index" class="article article-type-article" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/31/2018-07-31-rocketmq-store-index/" class="article-date">
-  <time datetime="2018-07-30T16:03:00.000Z" itemprop="datePublished">2018-07-31</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/源码分析/">源码分析</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/31/2018-07-31-rocketmq-store-index/">RocketMQ的存储索引的实现方法</a>
-    </h1>
+    <a href="/2018/07/31/2018-07-31-rocketmq-store-index/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">RocketMQ的存储索引的实现方法</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="RocketMQ存储索引解读"><a href="#RocketMQ存储索引解读" class="headerlink" title="RocketMQ存储索引解读"></a>RocketMQ存储索引解读</h2><h4 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a>索引结构</h4><p>索引包括3个部分，分别是Header、Slot、Index。这3个部分是顺序存储的。其中Header的长度为40个字节。</p>
-<p>Header</p>
-<table>
-<thead>
-<tr>
-<th>beginTimestamp</th>
-<th>endTimestamp</th>
-<th>beginPhyOffset</th>
-<th>endPhyOffset</th>
-<th>hashSlotCount</th>
-<th>indexCount</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>long</td>
-<td>long</td>
-<td>long</td>
-<td>long</td>
-<td>int</td>
-<td>int</td>
-</tr>
-<tr>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>4</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<p>Slot</p>
-<table>
-<thead>
-<tr>
-<th>indexCount</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>int</td>
-</tr>
-<tr>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<p>Index</p>
-<table>
-<thead>
-<tr>
-<th>keyHash</th>
-<th>phyOffset</th>
-<th>timeDiff</th>
-<th>slotValue</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>int</td>
-<td>long</td>
-<td>int</td>
-<td>int</td>
-</tr>
-<tr>
-<td>4</td>
-<td>8</td>
-<td>4</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<p>索引文件存储的长度为<br><code>IndexHeader.INDEX_HEADER_SIZE + (hashSlotNum * hashSlotSize) + (indexNum * indexSize)</code><br>默认值为<br><code>40 + 5000000 * 4 + 5000000 * 4 * 20</code><br>其中文件头的长度为40字节，slot的长度为4字节， index的长度为20字节</p>
-<p>Slot和Index的位置算法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> keyHash = indexKeyHashMethod(key);</span><br><span class="line"><span class="keyword">int</span> slotPos = keyHash % <span class="keyword">this</span>.hashSlotNum;</span><br><span class="line"><span class="keyword">int</span> absSlotPos = IndexHeader.INDEX_HEADER_SIZE + slotPos * hashSlotSize;</span><br><span class="line"><span class="keyword">int</span> absIndexPos = IndexHeader.INDEX_HEADER_SIZE + <span class="keyword">this</span>.hashSlotNum * hashSlotSize</span><br><span class="line">        + <span class="keyword">this</span>.indexHeader.getIndexCount() * indexSize;</span><br></pre></td></tr></table></figure></p>
-<p>Slot和Index的内容<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absIndexPos, keyHash);</span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putLong(absIndexPos + <span class="number">4</span>, phyOffset);</span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absIndexPos + <span class="number">4</span> + <span class="number">8</span>, (<span class="keyword">int</span>) timeDiff);</span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absIndexPos + <span class="number">4</span> + <span class="number">8</span> + <span class="number">4</span>, slotValue);</span><br><span class="line"></span><br><span class="line"><span class="keyword">this</span>.mappedByteBuffer.putInt(absSlotPos, <span class="keyword">this</span>.indexHeader.getIndexCount());</span><br></pre></td></tr></table></figure></p>
-<h4 id="搜索算法"><a href="#搜索算法" class="headerlink" title="搜索算法"></a>搜索算法</h4><p>计算KEY在索引文件中的位置方法如下：</p>
-<ol>
-<li>计算KEY的哈希值</li>
-<li>用计算的结果除以slot的数量，取余</li>
-<li>头文件长度 + 余数 * slot的长度即为slot的位置</li>
-<li>slot中存储的值为index的数量</li>
-<li>头文件长度 + slot数量 <em> slot的长度 + index数量 </em> index的长度即为index的位置</li>
-<li>按index的内容取出数据</li>
-</ol>
-<h4 id="索引文件名称"><a href="#索引文件名称" class="headerlink" title="索引文件名称"></a>索引文件名称</h4><p>索引文件的名称是由时间戳构成的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">String.format(<span class="string">"%04d%02d%02d%02d%02d%02d%03d"</span>, </span><br><span class="line">    cal.get(Calendar.YEAR), </span><br><span class="line">    cal.get(Calendar.MONTH) + <span class="number">1</span>,</span><br><span class="line">    cal.get(Calendar.DAY_OF_MONTH), </span><br><span class="line">    cal.get(Calendar.HOUR_OF_DAY), </span><br><span class="line">    cal.get(Calendar.MINUTE), </span><br><span class="line">    cal.get(Calendar.SECOND),</span><br><span class="line">    cal.get(Calendar.MILLISECOND));</span><br></pre></td></tr></table></figure></p>
-<h4 id="优化手段"><a href="#优化手段" class="headerlink" title="优化手段"></a>优化手段</h4><ol>
-<li>服务在启动时会把所有的索引文件加载到内存中</li>
-<li>定期清理过期索引文件</li>
-<li>异步同步索引到磁盘</li>
-</ol>
-<h4 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h4><ol>
-<li>slot的作用是什么呢，为什么不直接使用index</li>
-<li>对于KEY的哈希计算有一定的几率计算结果相同，即哈希值相同</li>
-<li>由于代码中把文件锁的代码注释掉了，这样不会有并发问题吗</li>
-</ol>
-<h4 id="用到的类"><a href="#用到的类" class="headerlink" title="用到的类"></a>用到的类</h4><ol>
-<li>ByteBuffer</li>
-<li>MappedByteBuffer</li>
-<li>FileChannel</li>
-<li>FileLock</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/07/31/2018-07-31-rocketmq-store-index/" data-id="cjkm951900001mexj4fi6ll9o" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RacketMQ/">RacketMQ</a></li></ul>
-
-    </footer>
-  </div>
   
 </article>
-
-
-  
 
 </section>
         
